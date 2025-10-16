@@ -1,0 +1,98 @@
+import React, { createContext, useState, useEffect } from 'react';
+
+import api from '../services/api.js';
+import { useNavigation } from '@react-navigation/native'
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const AuthContext = createContext({});
+
+function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    async function loadStorage() {
+      const storageUser = await AsyncStorage.getItem('@Copyfan');
+      if (storageUser) {
+        const response = await api.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${storageUser}`,
+          },
+        }).catch(() => {
+          setUser(null);
+        });
+        api.defaults.headers.common['Authorization'] = `Bearer ${storageUser}`;
+        setUser(response.data);
+        setLoading(false);
+      }
+      setLoading(false);
+    }
+    loadStorage();
+  }, []);
+
+  async function signUp(name, email,password) {
+    setLoadingAuth(true);
+    try {
+      const response = await api.post('/auth/register', {
+        name: name,
+        email: email,
+        password: password,
+        role : 'user',
+        course_id: 'd50fa0a8-a2e3-4b67-a0c9-298fc6b540f3'
+      });
+
+      navigation.goBack();
+      setLoadingAuth(false);
+    } catch (error) {
+      console.log('Erro ao cadastrar: ' + error);
+      setLoadingAuth(false);
+    }
+  }
+  async function signIn(email,password) {
+    setLoadingAuth(true);
+    try {
+      const response = await api.post('/auth/login', {
+        email: email,
+        password: password
+      })
+      const { id, name, token } = response.data;
+      const data = {
+        id,
+        name,
+        email,
+        token
+      };
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      await AsyncStorage.setItem('@Copyfan', token);
+
+      setUser({
+        id, name, email
+      });
+      setLoadingAuth(false);
+    }catch (error) {
+      console.log('Erro ao logar: ' + error);
+      setLoadingAuth(false);
+    }
+  }
+
+
+  async function signOut() {
+    await AsyncStorage.clear()
+    .then(() => {
+      setUser(null);
+    });
+  }
+
+  return (
+    <AuthContext.Provider value={{ signed: !!user, user, signUp, signIn, signOut,loadingAuth, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export default AuthProvider;
