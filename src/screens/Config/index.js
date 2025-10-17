@@ -1,14 +1,13 @@
-import react , {useContext} from 'react';
+import react from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AuthContext } from '../../contexts/auth';
-import {View,Text, Button} from 'react-native';
+import { BackGround, LogoutButton, LogoutText } from './styles';
 
-export default function ConfigScreen() {
-    const {signOut} = useContext(AuthContext);
-    return(
-        <View>
-            <Text>Config Screen</Text>
-            <Button title="Sair" onPress={() => signOut()} />
-        </View>
-    )
+export default function HomeScreen() {
+  return (
+    <BackGround>
+      <LogoutButton onPress={() => signOut()}>
+        <LogoutText>Sair</LogoutText>
+      </LogoutButton>
+    </BackGround>
+  );
 }

@@ -16,24 +16,32 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     async function loadStorage() {
-      const storageUser = await AsyncStorage.getItem('@Copyfan');
+      const storageUser = await AsyncStorage.getItem('@Copyfan'); 
       if (storageUser) {
-        const response = await api.get('/users/me', {
-          headers: {
-            Authorization: `Bearer ${storageUser}`,
-          },
-        }).catch(() => {
+        try {
+          const response = await api.get('/users/me', {
+            headers: {
+              Authorization: `Bearer ${storageUser}`,
+            },
+          });
+          
+          if(response && response.data) {
+              api.defaults.headers.common['Authorization'] = `Bearer ${storageUser}`;
+              setUser(response.data);
+          } else {
+              await AsyncStorage.removeItem('@Copyfan');
+              setUser(null);
+          }
+
+        } catch (error) {
+          await AsyncStorage.removeItem('@Copyfan');
           setUser(null);
-        });
-        api.defaults.headers.common['Authorization'] = `Bearer ${storageUser}`;
-        setUser(response.data);
-        setLoading(false);
+        }
       }
       setLoading(false);
     }
     loadStorage();
-  }, []);
-
+}, []);
   async function signUp(name, email,password) {
     setLoadingAuth(true);
     try {
@@ -59,19 +67,23 @@ function AuthProvider({ children }) {
         email: email,
         password: password
       })
-      const { id, name, token } = response.data;
+      const { id, name, token, role } = response.data;
+      console.log("Token recebido:", token);
       const data = {
         id,
         name,
         email,
+        role,
         token
       };
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+      console.log("Header Axios configurado:", api.defaults.headers.common['Authorization']);
+
       await AsyncStorage.setItem('@Copyfan', token);
 
       setUser({
-        id, name, email
+        id, name, email, role
       });
       setLoadingAuth(false);
     }catch (error) {

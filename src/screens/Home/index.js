@@ -1,11 +1,11 @@
 import react from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import {View,Text} from 'react-native';
+import { BackGround } from './styles';
 
 export default function HomeScreen() {
     return(
-        <View>
-            <Text>Home Screen</Text>
-        </View>
+            <BackGround>
+            </BackGround>
     )
 }
+    
