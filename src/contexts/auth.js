@@ -78,8 +78,6 @@ function AuthProvider({ children }) {
       };
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      console.log("Header Axios configurado:", api.defaults.headers.common['Authorization']);
-
       await AsyncStorage.setItem('@Copyfan', token);
 
       setUser({

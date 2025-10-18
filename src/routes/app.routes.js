@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import { AuthContext } from '../contexts/auth';
 
 import Home from '../screens/Home';
-import Orders from '../screens/Pedidos';
+import Orders from '../screens/Orders';
 import Config from '../screens/Config';
 import { TouchableOpacity } from 'react-native';
 
@@ -33,7 +33,7 @@ function AppRoutes() {
           headerTitle: `Olá, ${user.name}`,
           headerRight: () => (
             <TouchableOpacity style={{ marginRight: 15 }}>
-              <Icon name="shopping-cart" size={25} color="#fff" />
+              <Icon name="bell" size={25} color="#fff" />
             </TouchableOpacity>
           ),
         }}
