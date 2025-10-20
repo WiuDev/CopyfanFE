@@ -17,6 +17,10 @@ const MaterialListItem = ({item, onPress}) => {
           <DetailLabel>Total de Páginas</DetailLabel>
           <DetailValue>{item.total_pages}</DetailValue>
         </DetailItem>
+        <DetailItem>
+          <DetailLabel>User:</DetailLabel>
+          <DetailValue>{item.uploader ? item.uploader.name : 'Sistema'}</DetailValue>
+        </DetailItem>
       </DetailsGrid>
     </ItemContainer>
   );

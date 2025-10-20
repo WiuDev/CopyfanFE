@@ -29,7 +29,7 @@ export default function HomeScreen() {
   }, []);
 
   const quickNavigationData = [
-    { id: '1', name: 'Enviar', icon: 'upload', screen: 'Send' },
+    { id: '1', name: 'Enviar', icon: 'upload', screen: 'SendMaterialScreen' },
     { id: '2', name: 'Listas', icon: 'book-open', screen: 'Lists' },
   ];
 

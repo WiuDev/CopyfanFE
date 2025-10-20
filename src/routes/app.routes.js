@@ -1,70 +1,30 @@
-import React, { useContext } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Feather';
-import { AuthContext } from '../contexts/auth';
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
+import TabNavigator from './TabNavigator.routes'; 
+import SendScreen from '../screens/Send';
 
-import Home from '../screens/Home';
-import Orders from '../screens/Orders';
-import Config from '../screens/Config';
-import { TouchableOpacity } from 'react-native';
+const RootStack = createStackNavigator();
 
-const Tab = createBottomTabNavigator();
+export default function AppRoutes() {
+    return (
+        <RootStack.Navigator>
+            
+            <RootStack.Screen
+                name="MainTabs"
+                component={TabNavigator}
+                options={{ headerShown: false }} 
+            />
+            <RootStack.Screen
+                name="SendMaterialScreen" 
 
-function AppRoutes() {
-  const { user } = useContext(AuthContext);
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: '#171515',
-        tabBarStyle: { backgroundColor: '#5D82FB', paddingTop: 5, height: 60 },
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          headerStyle: { backgroundColor: '#5D82FB' },
-          headerTintColor: '#fff',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home" color={color} size={size} />
-          ),
-          headerTitle: `Olá, ${user.name}`,
-          headerRight: () => (
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <Icon name="bell" size={25} color="#fff" />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Orders"
-        component={Orders}
-        options={{
-          title: 'Pedidos',
-          headerTitle: 'Meus Pedidos',
-          headerStyle: { backgroundColor: '#5D82FB' },
-          headerTintColor: '#fff',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="file-text" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Config"
-        component={Config}
-        options={{
-          title: 'Configurações',
-          headerStyle: { backgroundColor: '#5D82FB' },
-          headerTintColor: '#fff',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="settings" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
+                component={SendScreen}
+                options={{
+                    headerShown: true, 
+                    title: 'Enviar Novo Material',
+                    headerStyle: { backgroundColor: '#5D82FB' },
+                    headerTintColor: '#fff',
+                }}
+            />
+        </RootStack.Navigator>
+    );
 }
-
-export default AppRoutes;
