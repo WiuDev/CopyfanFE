@@ -65,7 +65,7 @@ export const FilePickerButton = styled(TouchableOpacity)`
 
 
 export const SubmitButton = styled(TouchableOpacity)`
-  background-color: #007AFF;
+  background-color: #FF9C55;
   padding: 15px;
   border-radius: 8px;
   align-items: center;

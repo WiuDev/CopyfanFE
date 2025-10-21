@@ -59,7 +59,11 @@ export default function HomeScreen() {
             renderItem={({ item }) => (
               <MaterialListItem
                 item={item}
-                onPress={() => navigation.navigate('MaterialDetail', { id: item.id })}
+                onPress={() =>
+                  navigation.navigate('OrderConfigModal', {
+                    materialId: item.id,
+                  })
+                }
               />
             )}
             scrollEnabled={false}

@@ -16,7 +16,7 @@ const getStatusColor = (status) => {
   }
 };
 export const ItemContainer = styled(TouchableOpacity)`
-  background-color: #FFFFFF;
+  background-color: #FFF9F2;
   padding: 18px 15px;
   border-radius: 10px;
   margin-bottom: 15px;
@@ -76,8 +76,9 @@ export const TotalValueText = styled(Text)`
   font-size: 22px;
   font-weight: bold;
   color: #2C3E50; 
-  /* Cor de destaque para o valor, exceto se for o preço principal do app */
+
 `;
+
 
 export const ItemListHeader = styled(Text)`
   font-size: 14px;

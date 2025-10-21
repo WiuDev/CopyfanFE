@@ -35,21 +35,20 @@ export default function SendScreen() {
       if (!result) return;
 
       const name = result.name || result.fileName || 'arquivo';
-      let uri = result.uri; // URI inicial (content://)
+      let uri = result.uri;
       const type = result.type || 'application/octet-stream';
-      // --- 1. LÓGICA DE CONVERSÃO OBRIGATÓRIA (Android) ---
+
       if (Platform.OS === 'android' && uri.startsWith('content://')) {
-        // O RNFS.CachesDirectoryPath é o único local confiável para escrita
+
         const destPath = `${RNFS.CachesDirectoryPath}/${name}`;
 
-        // RNFS COPIA O CONTEÚDO DO content:// PARA O CACHE
+
         await RNFS.copyFile(uri, destPath);
 
-        // A URI final para upload DEVE ser o caminho file://
+  
         uri = `file://${destPath}`;
       }
 
-      // --- 2. Salva o objeto File com o URI file:// (ou o original do iOS) ---
       setFile({ uri, name, type });
     } catch (err) {
       if (err?.message?.includes('canceled')) {
@@ -62,7 +61,7 @@ export default function SendScreen() {
   };
 
   const handleSubmit = async () => {
-    // 1. Validação dos inputs do formulário
+
     if (!name || !classPeriod || !courseId || !file) {
       Alert.alert(
         'Atenção',
@@ -82,13 +81,13 @@ export default function SendScreen() {
 
       const formData = new FormData();
 
-      // Dados estáticos do formulário
+
       formData.append('name', name);
       formData.append('classPeriod', classPeriod);
       formData.append('course_id', courseId);
 
       formData.append('file', {
-        uri: `data:${file.type};base64,${fileContentBase64}`, // URI Data (formato Base64)
+        uri: `data:${file.type};base64,${fileContentBase64}`,
         name: file.name,
         type: file.type,
       });
@@ -97,7 +96,7 @@ export default function SendScreen() {
       await api.postForm('/materials', formData);
       console.log('Upload finalizado com sucesso');
       Alert.alert('Sucesso', 'Arquivo enviado e pronto para pedido!');
-      // Idealmente, você chamaria navigation.goBack() aqui
+
     } catch (err) {
       const errorMessage =
         err.response?.data?.error ||
