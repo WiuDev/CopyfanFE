@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -76,7 +76,6 @@ export default function OrderModal({ route }) {
           binding: binding,
           front_back: frontBack,
         };
-        console.log('Dados enviados para cálculo de preço:', dataToSend);
         const response = await api.post('/orders/calculate', dataToSend);
         setCalculatedPrice(response.data.formattedPrice);
         setRawPrice(response.data.totalPrice);
@@ -117,13 +116,25 @@ export default function OrderModal({ route }) {
       const response = await api.post('/orders', orderData);
       Alert.alert(
         'Pedido Enviado!',
-        `Seu pedido #${response.data.id.substring(
+        `Seu pedido #${response.data.order.substring(
           0,
           8,
         )} foi criado com sucesso. Total: ${calculatedPrice}.`,
         [{ text: 'OK', onPress: () => navigation.goBack() }],
       );
     } catch (error) {
+      if (error.response && error.response.status === 201) {
+        const successfulResponse = error.response;
+        Alert.alert(
+          'Pedido Enviado!',
+          `Seu pedido #${successfulResponse.data.id.substring(
+            0,
+            8,
+          )} foi criado com sucesso. Total: ${calculatedPrice}.`,
+          [{ text: 'OK', onPress: () => navigation.goBack() }],
+        );
+        return;
+      }
       const errorMessage =
         error.response?.data?.error || 'Não foi possível criar o pedido.';
       Alert.alert('Falha', errorMessage);
@@ -182,14 +193,11 @@ export default function OrderModal({ route }) {
               <ActivityIndicator size="small" color="#FF9C55" />
             </View>
           ) : (
-                <CalculatedPriceText>{calculatedPrice}</CalculatedPriceText>
+            <CalculatedPriceText>{calculatedPrice}</CalculatedPriceText>
           )}
         </PriceValueContainer>
       </PriceDisplay>
-      <SubmitButton
-        onPress={handleCreateOrder}
-        disabled={loadingPrice}
-      >
+      <SubmitButton onPress={handleCreateOrder} disabled={loadingPrice}>
         <SubmitButtonText> Criar Pedido </SubmitButtonText>
       </SubmitButton>
       <TouchableOpacity
