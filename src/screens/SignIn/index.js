@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Platform, ActivityIndicator } from 'react-native';
+import { Platform, ActivityIndicator, Alert } from 'react-native';
 
 import {
   BackGround,
@@ -24,6 +24,10 @@ export default function SignIn() {
   const { signIn, loadingAuth } = useContext(AuthContext);
 
   function HandleLogin() {
+    if(email === '' || password === '') {
+      Alert.alert('Atenção', 'Preencha todos os campos!');
+      return;
+    }
     signIn(email, password);
   }
 

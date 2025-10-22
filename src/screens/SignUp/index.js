@@ -20,6 +20,7 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [courseId, setCourseId] = useState(null);
+  
   const isValidEmail = email => {
     const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
