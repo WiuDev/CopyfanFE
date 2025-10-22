@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import TabNavigator from './TabNavigator.routes'; 
 import SendScreen from '../screens/Send';
 import OrderModal from '../components/OrderModal';
+import MaterialDetailScreen from '../screens/MaterialDetail';
 
 const RootStack = createStackNavigator();
 
@@ -33,6 +34,16 @@ export default function AppRoutes() {
                     presentation: 'modal', 
                     headerShown: true, 
                     title: 'Configurar e Orçar Pedido',
+                    headerStyle: { backgroundColor: '#5D82FB' },
+                    headerTintColor: '#fff',
+                }}
+            />
+            <RootStack.Screen
+                name="MaterialDetail"
+                component={MaterialDetailScreen}
+                options={{
+                    headerShown: true,
+                    title: 'Detalhes do Material',
                     headerStyle: { backgroundColor: '#5D82FB' },
                     headerTintColor: '#fff',
                 }}

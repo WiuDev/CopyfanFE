@@ -114,27 +114,50 @@ export default function OrderModal({ route }) {
     };
     try {
       const response = await api.post('/orders', orderData);
-      Alert.alert(
-        'Pedido Enviado!',
-        `Seu pedido #${response.data.order.substring(
-          0,
-          8,
-        )} foi criado com sucesso. Total: ${calculatedPrice}.`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }],
-      );
-    } catch (error) {
-      if (error.response && error.response.status === 201) {
-        const successfulResponse = error.response;
+      const pedidoIdCurto = response.data.order.substring(0, 8);
+
+      if (response && response.data && response.data.order) {
         Alert.alert(
-          'Pedido Enviado!',
-          `Seu pedido #${successfulResponse.data.id.substring(
-            0,
-            8,
-          )} foi criado com sucesso. Total: ${calculatedPrice}.`,
-          [{ text: 'OK', onPress: () => navigation.goBack() }],
+          `Pedido # ${pedidoIdCurto} Enviado!`,
+
+          `Seu pedido foi criado com sucesso.\nTotal a pagar: ${calculatedPrice}.`,
+          [
+            {
+              text: 'OK',
+              onPress: () =>
+                navigation.navigate('MainTabs', {
+                  screen: 'Orders',
+                }),
+            },
+          ],
         );
         return;
       }
+    } catch (error) {
+      const pedidoIdCurto = successfulResponse.data.order.substring(0, 8);
+
+      if (error.response && error.response.status === 201) {
+        const successfulResponse = error.response;
+
+        if (successfulResponse.data && successfulResponse.data.order) {
+          Alert.alert(
+            `Pedido # ${pedidoIdCurto} Enviado!`,
+
+            `Seu pedido foi criado com sucesso.\nTotal a pagar: ${calculatedPrice}.`,
+            [
+              {
+                text: 'OK',
+                onPress: () =>
+                  navigation.navigate('MainTabs', {
+                    screen: 'Orders',
+                  }),
+              },
+            ],
+          );
+          return;
+        }
+      }
+
       const errorMessage =
         error.response?.data?.error || 'Não foi possível criar o pedido.';
       Alert.alert('Falha', errorMessage);

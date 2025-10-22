@@ -60,7 +60,7 @@ export default function HomeScreen() {
               <MaterialListItem
                 item={item}
                 onPress={() =>
-                  navigation.navigate('OrderConfigModal', {
+                  navigation.navigate('MaterialDetail', {
                     materialId: item.id,
                   })
                 }
