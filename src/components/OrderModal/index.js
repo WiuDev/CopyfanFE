@@ -48,18 +48,22 @@ export default function OrderModal({ route }) {
     const numQuantity = Number(quantity);
 
     if (
-      !materialId ||
       isNaN(numStart) ||
-      isNaN(numEnd) ||
-      isNaN(numQuantity) ||
       numStart <= 0 ||
+      isNaN(numEnd) ||
+      numEnd <= 0 ||
+      isNaN(numQuantity) ||
       numQuantity <= 0
     ) {
-      setCalculatedPrice('R$ 0,00');
+      setCalculatedPrice('Valores Inválidos');
       return;
     }
     if (numStart > numEnd) {
-      setCalculatedPrice('Páginas inválidas');
+      setCalculatedPrice('Pág. Final < Pág. Inicial');
+      return;
+    }
+    if (!materialId) {
+      setCalculatedPrice('Material Indisponível');
       return;
     }
 
@@ -80,8 +84,33 @@ export default function OrderModal({ route }) {
         setCalculatedPrice(response.data.formattedPrice);
         setRawPrice(response.data.totalPrice);
       } catch (error) {
-        console.error('Erro ao calcular o preço:', error);
-        setCalculatedPrice('Erro ao calcular');
+      // 💡 NOVA LÓGICA DE TRATAMENTO DE ERRO (Defensiva)
+        let priceErrorMsg = 'Erro ao calcular';
+
+        // 1. Tentar obter a mensagem do backend de forma segura
+        const apiMessage =
+          error.response?.data?.message || error.response?.data?.error;
+        const statusCode = error.response?.status;
+
+        if (statusCode === 400) {
+          // Erro de Validação de Regra de Negócio
+          if (apiMessage) {
+            // Se o backend enviou uma mensagem específica (ex: "Página final excede o limite")
+            priceErrorMsg = apiMessage;
+          } else {
+            // Mensagem padrão para 400 (Bad Request) que o frontend pode inferir.
+            priceErrorMsg = 'Página fora do limite ou dados inválidos';
+          }
+        } else if (statusCode === 401 || statusCode === 403) {
+          // Erros de autenticação/autorização
+          priceErrorMsg = 'Não autorizado a calcular preço';
+        } else if (statusCode) {
+          // Outros erros HTTP
+          priceErrorMsg = `Erro ${statusCode} - Falha na API`;
+        }
+        // Se error.response for undefined (erro de rede, timeout), priceErrorMsg será 'Erro ao calcular' (padrão)
+
+        setCalculatedPrice(priceErrorMsg);
       } finally {
         setLoadingPrice(false);
       }
@@ -90,8 +119,44 @@ export default function OrderModal({ route }) {
   }, [startPage, endPage, quantity, colored, binding, frontBack, materialId]);
 
   const handleCreateOrder = async () => {
+    const numStart = Number(startPage);
+    const numEnd = Number(endPage);
+    const numQuantity = Number(quantity);
     if (!startPage || !endPage || !quantity || !materialId) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
+    if (isNaN(numStart) || isNaN(numEnd) || isNaN(numQuantity)) {
+      Alert.alert(
+        'Erro',
+        'As páginas e a quantidade devem ser números válidos.',
+      );
+      return;
+    }
+    if (numStart <= 0 || numEnd <= 0 || numQuantity <= 0) {
+      Alert.alert(
+        'Erro',
+        'As páginas e a quantidade devem ser maiores que zero.',
+      );
+      return;
+    }
+    if (numStart > numEnd) {
+      Alert.alert(
+        'Erro',
+        'A "Página Inicial" não pode ser maior que a "Página Final".',
+      );
+      return;
+    }
+    if (
+      rawPrice <= 0 ||
+      calculatedPrice === 'Erro ao calcular' ||
+      calculatedPrice === 'Valores Inválidos' ||
+      calculatedPrice === 'Pág. Final < Pág. Inicial'
+    ) {
+      Alert.alert(
+        'Erro',
+        'O preço não foi calculado corretamente. Verifique os campos e tente novamente.',
+      );
       return;
     }
     if (loadingPrice) {
@@ -134,34 +199,12 @@ export default function OrderModal({ route }) {
         return;
       }
     } catch (error) {
-      const pedidoIdCurto = successfulResponse.data.order.substring(0, 8);
-
-      if (error.response && error.response.status === 201) {
-        const successfulResponse = error.response;
-
-        if (successfulResponse.data && successfulResponse.data.order) {
-          Alert.alert(
-            `Pedido # ${pedidoIdCurto} Enviado!`,
-
-            `Seu pedido foi criado com sucesso.\nTotal a pagar: ${calculatedPrice}.`,
-            [
-              {
-                text: 'OK',
-                onPress: () =>
-                  navigation.navigate('MainTabs', {
-                    screen: 'Orders',
-                  }),
-              },
-            ],
-          );
-          return;
-        }
-      }
-
       const errorMessage =
-        error.response?.data?.error || 'Não foi possível criar o pedido.';
-      Alert.alert('Falha', errorMessage);
-      console.error('Erro na criação do pedido:', error);
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Ocorreu um erro. Verifique sua conexão ou tente novamente.';
+
+      Alert.alert('Falha ao Criar Pedido', errorMessage);
     }
   };
 
