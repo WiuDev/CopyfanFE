@@ -26,18 +26,6 @@ export const ScreenTitle = styled(Text)`
   color: #333;
 `;
 
-
-export const PickerContainer = styled(View)`
-  border-width: 1px;
-  border-color: #CCC;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  height: 50px;
-  justify-content: center;
-  overflow: hidden; /* Para garantir que o Picker fique dentro da borda */
-`;
-
-
 export const StyledInput = styled(TextInput)`
   border-width: 1px;
   border-color: #CCC;
