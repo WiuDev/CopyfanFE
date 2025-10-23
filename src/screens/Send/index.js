@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import RNFS from 'react-native-fs';
-import { Alert, ActivityIndicator, Text } from 'react-native';
+import { Alert, ActivityIndicator, Text, Switch } from 'react-native';
 import { pick, keepLocalCopy, types } from '@react-native-documents/picker';
 import Feather from 'react-native-vector-icons/Feather';
 import api from '../../services/api';
 import CoursePicker from '../../components/CoursePicker';
+import { AuthContext } from '../../contexts/auth';
 import {
   Container,
   FormArea,
@@ -13,6 +14,8 @@ import {
   SubmitButton,
   ButtonText,
   StyledInput,
+  OptionRow,
+  OptionText,
 } from './styles';
 
 export default function SendScreen() {
@@ -21,6 +24,9 @@ export default function SendScreen() {
   const [courseId, setCourseId] = useState(null);
   const [file, setFile] = useState(null);
   const [loadingUpload, setLoadingUpload] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const { user } = useContext(AuthContext);
+  const isProfessor = user?.role === 'professor';
   const copyContentUriToFile = async (contentUri, fileName) => {
     const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
 
@@ -39,13 +45,10 @@ export default function SendScreen() {
       const type = result.type || 'application/octet-stream';
 
       if (Platform.OS === 'android' && uri.startsWith('content://')) {
-
         const destPath = `${RNFS.CachesDirectoryPath}/${name}`;
-
 
         await RNFS.copyFile(uri, destPath);
 
-  
         uri = `file://${destPath}`;
       }
 
@@ -61,7 +64,6 @@ export default function SendScreen() {
   };
 
   const handleSubmit = async () => {
-
     if (!name || !classPeriod || !courseId || !file) {
       Alert.alert(
         'Atenção',
@@ -73,6 +75,7 @@ export default function SendScreen() {
     setLoadingUpload(true);
 
     try {
+      const visibilityStatus = isProfessor ? isVisible : false;
       const fileContentBase64 = await RNFS.readFile(file.uri, 'base64');
 
       if (!fileContentBase64) {
@@ -81,22 +84,24 @@ export default function SendScreen() {
 
       const formData = new FormData();
 
-
       formData.append('name', name);
       formData.append('classPeriod', classPeriod);
       formData.append('course_id', courseId);
-
+      formData.append('is_visible', visibilityStatus);
       formData.append('file', {
         uri: `data:${file.type};base64,${fileContentBase64}`,
         name: file.name,
         type: file.type,
       });
-      console.log(file.uri, file.name, file.type);
+      console.log(file.uri, file.name, file.is_visible, file.type);
 
       await api.postForm('/materials', formData);
       console.log('Upload finalizado com sucesso');
       Alert.alert('Sucesso', 'Arquivo enviado e pronto para pedido!');
-
+      setName('');
+      setClassPeriod('');
+      setCourseId(null);
+      setFile(null);
     } catch (err) {
       const errorMessage =
         err.response?.data?.error ||
@@ -149,12 +154,23 @@ export default function SendScreen() {
               : 'Selecionar PDF ou Imagem'}
           </Text>
         </FilePickerButton>
+        {isProfessor && (
+          <OptionRow>
+            <OptionText>Disponibilizar Lista para Alunos</OptionText>
+            <Switch
+              value={isVisible}
+              onValueChange={setIsVisible}
+              trackColor={{ false: '#767577', true: '#FF9C55' }}
+              thumbColor={isVisible ? '#FFF' : '#f4f3f4'}
+            />
+          </OptionRow>
+        )}
 
         <SubmitButton onPress={handleSubmit} disabled={loadingUpload}>
           {loadingUpload ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <ButtonText>Enviar para Análise e Cadastro</ButtonText>
+            <ButtonText>Enviar Material</ButtonText>
           )}
         </SubmitButton>
       </FormArea>

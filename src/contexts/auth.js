@@ -99,7 +99,9 @@ function AuthProvider({ children }) {
       });
       setLoadingAuth(false);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Email ou senha inválidos. Tente novamente.';
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Erro desconhecido';
+      console.log('Erro ao logar: ' + error);
       Alert.alert('Erro no Login', ` ${errorMessage}`);
       setLoadingAuth(false);
     }

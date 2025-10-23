@@ -1,36 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BackGround, SectionTitle, QuickNavArea, ContentArea } from './styles';
 import MaterialListItem from '../../components/MaterialListItem';
+import EmptyState from '../../components/EmptyState';
 import IconLink from '../../components/IconLink';
 import api from '../../services/api';
+import { AuthContext } from '../../contexts/auth';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-
+  const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [materialsList, setMaterialsList] = useState([]);
-
+  const fetchData = async () => {
+    if (!user?.id) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await api.get(`/materials?ownerId=${user.id}`);
+      setMaterialsList(response.data);
+    } catch (error) {
+      console.log('Erro ao buscar materiais: ' + error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get('/materials');
-        setMaterialsList(response.data);
-      } catch (error) {
-        console.error('Error fetching materials:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   const quickNavigationData = [
     { id: '1', name: 'Enviar', icon: 'upload', screen: 'SendMaterialScreen' },
-    { id: '2', name: 'Listas', icon: 'book-open', screen: 'Lists' },
+    { id: '2', name: 'Listas', icon: 'book-open', screen: 'ListsScreen' },
   ];
 
   return (
@@ -48,10 +53,14 @@ export default function HomeScreen() {
           ))}
         </QuickNavArea>
 
-        <SectionTitle>Materiais Disponíveis</SectionTitle>
+        <SectionTitle>Meus Materiais Enviados</SectionTitle>
 
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
+        ) : materialsList.length === 0 ? (
+          <EmptyState
+            onSend={() => navigation.navigate('SendMaterialScreen')}
+          />
         ) : (
           <FlatList
             data={materialsList}

@@ -42,7 +42,6 @@ export default function MaterialDetailScreen() {
 
       try {
         const metaResponse = await api.get(`/materials/${materialId}/metadata`);
-        console.log('Detalhes do material obtidos:', metaResponse.data);
         setMaterialDetails(metaResponse.data);
         const downloadHeaders = {
           Authorization: `Bearer ${token}`,
@@ -89,9 +88,6 @@ export default function MaterialDetailScreen() {
           <Pdf
             source={{ uri: localFileUri }}
             style={{ flex: 1, width: '100%' }}
-            onLoadComplete={(numberOfPages, filePath) => {
-              console.log(`PDF carregado com ${numberOfPages} páginas`);
-            }}
             onError={error => {
               console.error('Erro no PDF Viewer:', error);
               Alert.alert('Erro', 'Falha ao renderizar o PDF.');

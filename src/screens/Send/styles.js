@@ -1,6 +1,11 @@
 import styled from 'styled-components/native';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
 
 export const Container = styled(ScrollView)`
   flex: 1;
@@ -8,8 +13,23 @@ export const Container = styled(ScrollView)`
   padding: 15px;
 `;
 
+export const OptionRow = styled(View)`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom-width: 1px;
+  border-bottom-color: #e0e0e0;
+`;
+
+export const OptionText = styled.Text`
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+`;
+
 export const FormArea = styled(View)`
-  background-color: #FFF;
+  background-color: #fff;
   padding: 20px;
   border-radius: 10px;
   elevation: 3;
@@ -28,18 +48,16 @@ export const ScreenTitle = styled(Text)`
 
 export const StyledInput = styled(TextInput)`
   border-width: 1px;
-  border-color: #CCC;
+  border-color: #ccc;
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 15px;
   height: 50px;
-  background-color: #FFF;
+  background-color: #fff;
 `;
 
-
-
 export const FilePickerButton = styled(TouchableOpacity)`
-  background-color: #EEE;
+  background-color: #eee;
   border-radius: 8px;
   padding: 15px;
   margin-top: 15px;
@@ -48,12 +66,11 @@ export const FilePickerButton = styled(TouchableOpacity)`
   align-items: center;
   justify-content: center;
   border-width: 1px;
-  border-color: ${(props) => props.hasFile ? '#2ECC71' : '#DDD'};
+  border-color: ${props => (props.hasFile ? '#2ECC71' : '#DDD')};
 `;
 
-
 export const SubmitButton = styled(TouchableOpacity)`
-  background-color: #FF9C55;
+  background-color: #ff9c55;
   padding: 15px;
   border-radius: 8px;
   align-items: center;
@@ -61,7 +78,7 @@ export const SubmitButton = styled(TouchableOpacity)`
 `;
 
 export const ButtonText = styled(Text)`
-  color: #FFF;
+  color: #fff;
   font-size: 16px;
   font-weight: bold;
 `;

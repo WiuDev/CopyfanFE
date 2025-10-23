@@ -4,6 +4,7 @@ import TabNavigator from './TabNavigator.routes';
 import SendScreen from '../screens/Send';
 import OrderModal from '../components/OrderModal';
 import MaterialDetailScreen from '../screens/MaterialDetail';
+import ListsScreen from '../screens/Lists';
 
 const RootStack = createStackNavigator();
 
@@ -23,6 +24,17 @@ export default function AppRoutes() {
                 options={{
                     headerShown: true, 
                     title: 'Enviar Novo Material',
+                    headerStyle: { backgroundColor: '#5D82FB' },
+                    headerTintColor: '#fff',
+                }}
+            />
+             <RootStack.Screen
+                name="ListsScreen" 
+
+                component={ListsScreen}
+                options={{
+                    headerShown: true, 
+                    title: 'Listas Públicas',
                     headerStyle: { backgroundColor: '#5D82FB' },
                     headerTintColor: '#fff',
                 }}
