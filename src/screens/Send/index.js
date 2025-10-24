@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
 import RNFS from 'react-native-fs';
-import { Alert, ActivityIndicator, Text, Switch } from 'react-native';
+import {
+  Alert,
+  ActivityIndicator,
+  Text,
+  Switch,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  View,
+  Button,
+} from 'react-native';
 import { pick, keepLocalCopy, types } from '@react-native-documents/picker';
 import Feather from 'react-native-vector-icons/Feather';
 import api from '../../services/api';
@@ -21,11 +31,26 @@ import {
 export default function SendScreen() {
   const [name, setName] = useState('');
   const [classPeriod, setClassPeriod] = useState('');
+  const [isPeriodModalVisible, setIsPeriodModalVisible] = useState(false);
   const [courseId, setCourseId] = useState(null);
   const [file, setFile] = useState(null);
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useContext(AuthContext);
+  const PERIODS = [
+    { id: '1', label: '1º Periodo', value: '1º Periodo' },
+    { id: '2', label: '2º Periodo', value: '2º Periodo' },
+    { id: '3', label: '3º Periodo', value: '3º Periodo' },
+    { id: '4', label: '4º Periodo', value: '4º Periodo' },
+    { id: '5', label: '5º Periodo', value: '5º Periodo' },
+    { id: '6', label: '6º Periodo', value: '6º Periodo' },
+    { id: '7', label: '7º Periodo', value: '7º Periodo' },
+    { id: '8', label: '8º Periodo', value: '8º Periodo' },
+    { id: '9', label: '9º Periodo', value: '9º Periodo' },
+    { id: '10', label: '10º Periodo', value: '10º Periodo' },
+    { id: '0', label: 'Todos os Períodos', value: null },
+  ];
+
   const isProfessor = user?.role === 'professor';
   const copyContentUriToFile = async (contentUri, fileName) => {
     const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
@@ -33,6 +58,11 @@ export default function SendScreen() {
     await RNFS.copyFile(contentUri, destPath);
 
     return `file://${destPath}`;
+  };
+
+  const handlePeriodSelect = value => {
+    setClassPeriod(value);
+    setIsPeriodModalVisible(false);
   };
   const handleFilePick = async () => {
     try {
@@ -64,7 +94,7 @@ export default function SendScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!name || !classPeriod || !courseId || !file) {
+    if (!name || classPeriod === null || !courseId || !file) {
       Alert.alert(
         'Atenção',
         'Preencha todos os campos e selecione um arquivo.',
@@ -127,12 +157,35 @@ export default function SendScreen() {
           placeholderTextColor="#888"
         />
 
-        <StyledInput
-          placeholder="Período/Turma (Ex: 8º Semestre)"
-          value={classPeriod}
-          onChangeText={setClassPeriod}
-          placeholderTextColor="#888"
-        />
+        <OptionRow style={{ paddingHorizontal: 0, paddingVertical: 0 }}>
+          <TouchableOpacity
+            // Use um estilo que imite um input
+            style={{
+              borderWidth: 1,
+              borderColor: '#ccc',
+              borderRadius: 8,
+              padding: 10,
+              height: 50,
+              backgroundColor: '#fff',
+              marginBottom: 15,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              width: '100%',
+            }}
+            onPress={() => setIsPeriodModalVisible(true)}
+          >
+            <Text
+              style={{
+                color: classPeriod ? '#333' : '#888',
+                fontSize: 16,
+                marginLeft: 5,
+              }}
+            >
+              {classPeriod || 'Selecione o Período/Turma'}
+            </Text>
+          </TouchableOpacity>
+        </OptionRow>
 
         <CoursePicker
           selectedCourseId={courseId}
@@ -174,6 +227,49 @@ export default function SendScreen() {
           )}
         </SubmitButton>
       </FormArea>
+      <Modal
+        animationType="slide"
+        visible={isPeriodModalVisible}
+        onRequestClose={() => setIsPeriodModalVisible(false)}
+        transparent={false}
+      >
+        <View style={{ flex: 1, backgroundColor: '#FFF', paddingTop: 50 }}>
+          {/* CABEÇALHO DO MODAL */}
+          <View style={{ paddingHorizontal: 20 }}>
+            <Text
+              style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 20 }}
+            >
+              Selecione o Período/Turma
+            </Text>
+          </View>
+
+          {/* 🚨 AQUI VOCÊ COLA A FLATLIST */}
+          <FlatList
+            // Use o array PERIODS que você definiu no topo do SendScreen
+            data={PERIODS.filter(p => p.value !== null)}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={{
+                  padding: 15,
+                  borderBottomWidth: 1,
+                  borderColor: '#EEE',
+                }}
+                // Chama a função que salva o valor e fecha o modal
+                onPress={() => handlePeriodSelect(item.value)}
+              >
+                <Text style={{ fontSize: 16 }}>{item.label}</Text>
+              </TouchableOpacity>
+            )}
+          />
+
+          {/* BOTÃO FECHAR */}
+          <Button
+            title="Fechar"
+            onPress={() => setIsPeriodModalVisible(false)}
+          />
+        </View>
+      </Modal>
     </Container>
   );
 }

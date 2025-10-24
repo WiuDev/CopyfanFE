@@ -13,16 +13,16 @@ import {
 } from './styles';
 
 const PERIODS = [
-  { id: '1', label: '1º Semestre', value: '1º Semestre' },
-  { id: '2', label: '2º Semestre', value: '2º Semestre' },
-  { id: '3', label: '3º Semestre', value: '3º Semestre' },
-  { id: '4', label: '4º Semestre', value: '4º Semestre' },
-  { id: '5', label: '5º Semestre', value: '5º Semestre' },
-  { id: '6', label: '6º Semestre', value: '6º Semestre' },
-  { id: '7', label: '7º Semestre', value: '7º Semestre' },
-  { id: '8', label: '8 Semestre', value: '8º Semestre' },
-  { id: '9', label: '9º Semestre', value: '9º Semestre' },
-  { id: '10', label: '10º Semestre', value: '10º Semestre' },
+  { id: '1', label: '1º Periodo', value: '1º Periodo' },
+  { id: '2', label: '2º Periodo', value: '2º Periodo' },
+  { id: '3', label: '3º Periodo', value: '3º Periodo' },
+  { id: '4', label: '4º Periodo', value: '4º Periodo' },
+  { id: '5', label: '5º Periodo', value: '5º Periodo' },
+  { id: '6', label: '6º Periodo', value: '6º Periodo' },
+  { id: '7', label: '7º Periodo', value: '7º Periodo' },
+  { id: '8', label: '8º Periodo', value: '8º Periodo' },
+  { id: '9', label: '9º Periodo', value: '9º Periodo' },
+  { id: '10', label: '10º Periodo', value: '10º Periodo' },
   { id: '0', label: 'Todos os Períodos', value: null },
 ];
 
