@@ -51,6 +51,19 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>UIAppFonts</key>
+	<key>CFBundleURLTypes</key>
+	<array>
+ 	 <dict>
+ 	   <key>CFBundleTypeRole</key>
+ 	   <string>Editor</string>
+  	  <key>CFBundleURLName</key>
+   	 <string>com.copyfanapp</string>
+  	  <key>CFBundleURLSchemes</key>
+  	  <array>
+   	   <string>copyfanapp</string> 
+   	 </array>
+ 	 </dict>
+	</array>
 <array>
   <string>AntDesign.ttf</string>
   <string>Entypo.ttf</string>

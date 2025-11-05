@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { BackGround } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { FlatList, ActivityIndicator } from 'react-native';
 import { SectionTitle, ContentArea } from './styles';
 import OrdersListItem from '../../components/OrderListItem';
 import api from '../../services/api';
+import { AuthContext } from '../../contexts/auth';
 
 export default function OrdersScreen() {
   const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
   const [ordersList, setOrdersList] = useState([]);
@@ -28,6 +30,10 @@ export default function OrdersScreen() {
     fetchData();
   }, []);
 
+  const handleItemPress = item => {
+    navigation.navigate('OrderDetail', { id: item.id });
+  };
+
   return (
     <BackGround>
       <ContentArea showsVerticalScrollIndicator={false}>
@@ -41,7 +47,7 @@ export default function OrdersScreen() {
             renderItem={({ item }) => (
               <OrdersListItem
                 item={item}
-                onPress={() => navigation.navigate('OrderDetail', { id: item.id })}
+                onPress={() => handleItemPress(item)}
               />
             )}
             scrollEnabled={false}

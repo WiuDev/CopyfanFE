@@ -159,7 +159,7 @@ export default function SendScreen() {
 
         <OptionRow style={{ paddingHorizontal: 0, paddingVertical: 0 }}>
           <TouchableOpacity
-            // Use um estilo que imite um input
+
             style={{
               borderWidth: 1,
               borderColor: '#ccc',
@@ -243,9 +243,8 @@ export default function SendScreen() {
             </Text>
           </View>
 
-          {/* 🚨 AQUI VOCÊ COLA A FLATLIST */}
           <FlatList
-            // Use o array PERIODS que você definiu no topo do SendScreen
+
             data={PERIODS.filter(p => p.value !== null)}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
@@ -263,7 +262,6 @@ export default function SendScreen() {
             )}
           />
 
-          {/* BOTÃO FECHAR */}
           <Button
             title="Fechar"
             onPress={() => setIsPeriodModalVisible(false)}

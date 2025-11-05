@@ -5,6 +5,7 @@ import SendScreen from '../screens/Send';
 import OrderModal from '../components/OrderModal';
 import MaterialDetailScreen from '../screens/MaterialDetail';
 import ListsScreen from '../screens/Lists';
+import OrderDetailScreen from '../screens/OrderDetail';
 
 const RootStack = createStackNavigator();
 
@@ -56,6 +57,16 @@ export default function AppRoutes() {
                 options={{
                     headerShown: true,
                     title: 'Detalhes do Material',
+                    headerStyle: { backgroundColor: '#5D82FB' },
+                    headerTintColor: '#fff',
+                }}
+            />
+            <RootStack.Screen
+                name="OrderDetail"
+                component={OrderDetailScreen}
+                options={{
+                    headerShown: true,
+                    title: 'Detalhes do Pedido',
                     headerStyle: { backgroundColor: '#5D82FB' },
                     headerTintColor: '#fff',
                 }}
