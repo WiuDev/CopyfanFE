@@ -7,18 +7,25 @@ import { AuthContext } from '../contexts/auth';
 import Home from '../screens/Home';
 import Orders from '../screens/Orders';
 import Config from '../screens/Config';
-import { TouchableOpacity } from 'react-native';
+import { SafeAreaViewBase, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 function TabNavigator() {
   const { user } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={{
         tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: '#fff',
         tabBarInactiveTintColor: '#171515',
-        tabBarStyle: { backgroundColor: '#5D82FB', paddingTop: 5, height: 60 },
+        tabBarStyle: { 
+                    backgroundColor: '#5D82FB', 
+                    paddingTop: 5, 
+                    height: 60 + insets.bottom,
+                    paddingBottom: insets.bottom,
+                },
       }}
     >
       <Tab.Screen

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Platform, ActivityIndicator, Alert } from 'react-native';
 
 import {
@@ -16,6 +16,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../contexts/auth.js';
 
+
 export default function SignIn() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
@@ -23,8 +24,9 @@ export default function SignIn() {
 
   const { signIn, loadingAuth } = useContext(AuthContext);
 
+
   function HandleLogin() {
-    if(email === '' || password === '') {
+    if (email === '' || password === '') {
       Alert.alert('Atenção', 'Preencha todos os campos!');
       return;
     }
@@ -34,17 +36,19 @@ export default function SignIn() {
   return (
     <BackGround>
       <Container behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
-        <Logo source={require('../../assets/Logo.png')} style={{width: 150, height: 150}} resizeMode='contain' />
+        <Logo source={require('../../assets/Logo.png')} style={{ width: 150, height: 150 }} resizeMode='contain' />
         <AreaInput>
           <Input
             placeholder="Seu Email"
             value={email}
             onChangeText={setEmail}
+            placeholderTextColor='#121212'
           />
         </AreaInput>
         <AreaInput>
           <Input
             placeholder="Sua Senha"
+            placeholderTextColor='#121212'
             value={password}
             onChangeText={setPassword}
             secureTextEntry

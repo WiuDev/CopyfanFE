@@ -23,6 +23,7 @@ import {
   SubmitButton,
   SubmitButtonText,
 } from './styles';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function OrderModal({ route }) {
   const navigation = useNavigation();
@@ -84,31 +85,23 @@ export default function OrderModal({ route }) {
         setCalculatedPrice(response.data.formattedPrice);
         setRawPrice(response.data.totalPrice);
       } catch (error) {
-      // 💡 NOVA LÓGICA DE TRATAMENTO DE ERRO (Defensiva)
         let priceErrorMsg = 'Erro ao calcular';
 
-        // 1. Tentar obter a mensagem do backend de forma segura
         const apiMessage =
           error.response?.data?.message || error.response?.data?.error;
         const statusCode = error.response?.status;
 
         if (statusCode === 400) {
-          // Erro de Validação de Regra de Negócio
           if (apiMessage) {
-            // Se o backend enviou uma mensagem específica (ex: "Página final excede o limite")
             priceErrorMsg = apiMessage;
           } else {
-            // Mensagem padrão para 400 (Bad Request) que o frontend pode inferir.
             priceErrorMsg = 'Página fora do limite ou dados inválidos';
           }
         } else if (statusCode === 401 || statusCode === 403) {
-          // Erros de autenticação/autorização
           priceErrorMsg = 'Não autorizado a calcular preço';
         } else if (statusCode) {
-          // Outros erros HTTP
           priceErrorMsg = `Erro ${statusCode} - Falha na API`;
         }
-        // Se error.response for undefined (erro de rede, timeout), priceErrorMsg será 'Erro ao calcular' (padrão)
 
         setCalculatedPrice(priceErrorMsg);
       } finally {
@@ -209,69 +202,71 @@ export default function OrderModal({ route }) {
   };
 
   return (
-    <ScreenContainer contentContainerStyle={{ paddingBottom: 50 }}>
-      <FormSection>
-        <HeaderTitle>Configurar Impressão</HeaderTitle>
-        <Text>Página Inicial</Text>
-        <StyledInput
-          placeholder="Página Inicial (Ex: 1)"
-          value={startPage}
-          onChangeText={setStartPage}
-          keyboardType="numeric"
-          placeholderTextColor="#888"
-        />
-        <Text>Página Final</Text>
-        <StyledInput
-          placeholder="Página Final (Ex: 50)"
-          value={endPage}
-          onChangeText={setEndPage}
-          keyboardType="numeric"
-          placeholderTextColor="#888"
-        />
-        <Text>Quantidade</Text>
-        <StyledInput
-          placeholder="Quantidade de Cópias"
-          value={quantity}
-          onChangeText={setQuantity}
-          keyboardType="numeric"
-          placeholderTextColor="#888"
-        />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+      <ScreenContainer contentContainerStyle={{ paddingBottom: 50 }}>
+        <FormSection>
+          <HeaderTitle>Configurar Impressão</HeaderTitle>
+          <Text>Página Inicial</Text>
+          <StyledInput
+            placeholder="Página Inicial (Ex: 1)"
+            value={startPage}
+            onChangeText={setStartPage}
+            keyboardType="numeric"
+            placeholderTextColor="#888"
+          />
+          <Text>Página Final</Text>
+          <StyledInput
+            placeholder="Página Final (Ex: 50)"
+            value={endPage}
+            onChangeText={setEndPage}
+            keyboardType="numeric"
+            placeholderTextColor="#888"
+          />
+          <Text>Quantidade</Text>
+          <StyledInput
+            placeholder="Quantidade de Cópias"
+            value={quantity}
+            onChangeText={setQuantity}
+            keyboardType="numeric"
+            placeholderTextColor="#888"
+          />
 
-        <OptionRow>
-          <Text>Impressão Colorida</Text>
-          <Switch value={colored} onValueChange={setColored} />
-        </OptionRow>
-        <OptionRow>
-          <Text>Frente e Verso</Text>
-          <Switch value={frontBack} onValueChange={setFrontBack} />
-        </OptionRow>
-        <OptionRow style={{ borderBottomWidth: 0 }}>
-          <Text>Encadernação</Text>
-          <Switch value={binding} onValueChange={setBinding} />
-        </OptionRow>
-      </FormSection>
+          <OptionRow>
+            <Text>Impressão Colorida</Text>
+            <Switch value={colored} onValueChange={setColored} />
+          </OptionRow>
+          <OptionRow>
+            <Text>Frente e Verso</Text>
+            <Switch value={frontBack} onValueChange={setFrontBack} />
+          </OptionRow>
+          <OptionRow style={{ borderBottomWidth: 0 }}>
+            <Text>Encadernação</Text>
+            <Switch value={binding} onValueChange={setBinding} />
+          </OptionRow>
+        </FormSection>
 
-      <PriceDisplay>
-        <CalculatedPriceLabel>Custo Estimado:</CalculatedPriceLabel>
-        <PriceValueContainer>
-          {loadingPrice ? (
-            <View style={{ height: 38, justifyContent: 'center' }}>
-              <ActivityIndicator size="small" color="#FF9C55" />
-            </View>
-          ) : (
-            <CalculatedPriceText>{calculatedPrice}</CalculatedPriceText>
-          )}
-        </PriceValueContainer>
-      </PriceDisplay>
-      <SubmitButton onPress={handleCreateOrder} disabled={loadingPrice}>
-        <SubmitButtonText> Criar Pedido </SubmitButtonText>
-      </SubmitButton>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={{ alignItems: 'center' }}
-      >
-        <CancelButtonText>Cancelar</CancelButtonText>
-      </TouchableOpacity>
-    </ScreenContainer>
+        <PriceDisplay>
+          <CalculatedPriceLabel>Custo Estimado:</CalculatedPriceLabel>
+          <PriceValueContainer>
+            {loadingPrice ? (
+              <View style={{ height: 38, justifyContent: 'center' }}>
+                <ActivityIndicator size="small" color="#FF9C55" />
+              </View>
+            ) : (
+              <CalculatedPriceText>{calculatedPrice}</CalculatedPriceText>
+            )}
+          </PriceValueContainer>
+        </PriceDisplay>
+        <SubmitButton onPress={handleCreateOrder} disabled={loadingPrice}>
+          <SubmitButtonText> Criar Pedido </SubmitButtonText>
+        </SubmitButton>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ alignItems: 'center' }}
+        >
+          <CancelButtonText>Cancelar</CancelButtonText>
+        </TouchableOpacity>
+      </ScreenContainer>
+    </SafeAreaView>
   );
 }

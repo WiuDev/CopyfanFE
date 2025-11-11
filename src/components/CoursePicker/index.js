@@ -52,9 +52,10 @@ export default function CoursePicker({ selectedCourseId, onCourseChange }) {
         selectedValue={selectedCourseId}
         onValueChange={onCourseChange}
         mode="dropdown"
+        style={{ color: selectedCourseId ? '#121212' : '#A9A9A9' }}
       >
         {courses.map(course => (
-          <Picker.Item key={course.id} label={course.title} value={course.id} />
+          <Picker.Item key={course.id} label={course.title} value={course.id}/>
         ))}
       </Picker>
     </PickerContainer>

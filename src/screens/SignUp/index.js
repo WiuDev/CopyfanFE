@@ -95,13 +95,15 @@ export default function SignUp() {
             placeholder="Nome"
             value={name}
             onChangeText={text => setName(text)}
+            placeholderTextColor='#121212'
           />
         </AreaInput>
         <AreaInput>
           <Input
-            placeholder="Seu Email"
+            placeholder="Seu E-mail"
             value={email}
             onChangeText={text => setEmail(text)}
+            placeholderTextColor='#121212'
           />
         </AreaInput>
         <AreaInput>
@@ -110,6 +112,7 @@ export default function SignUp() {
             value={password}
             onChangeText={text => setPassword(text)}
             secureTextEntry={true}
+            placeholderTextColor='#121212'
           />
         </AreaInput>
         <AreaInput>
@@ -118,6 +121,7 @@ export default function SignUp() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={true}
+            placeholderTextColor='#121212'
           />
         </AreaInput>
         <View
