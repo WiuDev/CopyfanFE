@@ -51,7 +51,7 @@ export default function SendScreen() {
     { id: '0', label: 'Todos os Períodos', value: null },
   ];
 
-  const isProfessor = user?.role === 'professor';
+  const isProfessor = user?.role === 'professor' || user?.role === 'admin';
   const copyContentUriToFile = async (contentUri, fileName) => {
     const destPath = `${RNFS.CachesDirectoryPath}/${fileName}`;
 

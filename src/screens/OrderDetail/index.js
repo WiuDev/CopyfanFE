@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Alert, Linking, ActivityIndicator } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+
+import { useRoute } from '@react-navigation/native';
 import api from '../../services/api';
 import { AuthContext } from '../../contexts/auth';
+
+import StatusPicker from '../../components/StatusPicker';
+
 import {
   Container,
   ScrollContainer,
@@ -21,30 +25,71 @@ export default function OrderDetailScreen() {
   const route = useRoute();
   const { user } = useContext(AuthContext);
   const orderId = route.params?.id;
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+
+  const isAdmin = user?.role === 'admin';
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingPayment, setLoadingPayment] = useState(false);
 
-  useEffect(() => {
-    const fetchOrderDetails = async () => {
-      if (!orderId) {
-        Alert.alert('Erro', 'ID do pedido não encontrado.');
-        return;
-      }
-      try {
-        const response = await api.get(`/orders/${orderId}`);
-        setOrder(response.data);
-      } catch (error) {
-        console.error(`Erro ao buscar pedido ${orderId}:`, error);
-        Alert.alert('Erro', 'Não foi possível carregar os detalhes do pedido.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrderDetails();
+  const fetchOrderDetails = useCallback(async () => {
+    if (!orderId) {
+      Alert.alert('Erro', 'ID do pedido não encontrado.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await api.get(`/orders/${orderId}`);
+      setOrder(response.data);
+      setSelectedStatus(response.data.status);
+    } catch (error) {
+      console.error(`Erro ao buscar pedido ${orderId}:`, error);
+      Alert.alert('Erro', 'Não foi possível carregar os detalhes do pedido.');
+    } finally {
+      setLoading(false);
+    }
   }, [orderId]);
+
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [fetchOrderDetails]);
+
+  const handleUpdateStatus = async () => {
+    const newStatus = selectedStatus;
+    if (!order || !selectedStatus || selectedStatus === order.status) {
+      Alert.alert('Atenção', 'Selecione um novo status diferente do atual.');
+      return;
+    }
+
+    setLoadingUpdate(true);
+    try {
+      await api.put(`/orders/${order.id}/status`, {
+        status: newStatus,
+      });
+
+      Alert.alert(
+        'Sucesso',
+        `Status do pedido atualizado para ${newStatus
+          .replace('_', ' ')
+          .toUpperCase()}.`,
+      );
+      // Atualiza o estado local
+      setOrder(prev => ({ ...prev, status: newStatus }));
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      Alert.alert(
+        'Erro',
+        `Falha ao atualizar status: ${
+          error.response?.data?.error || 'Erro de conexão'
+        }`,
+      );
+      setSelectedStatus(order.status);
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
 
   const handleInitiatePayment = async () => {
     if (!order) return;
@@ -56,7 +101,9 @@ export default function OrderDetailScreen() {
     if (!isWaitingForPayment) {
       Alert.alert(
         'Atenção',
-        `O pedido já está em status ${order.status.toUpperCase()}.`,
+        `O pedido já está em status ${order.status
+          .replace('_', ' ')
+          .toUpperCase()}.`,
       );
       return;
     }
@@ -67,15 +114,21 @@ export default function OrderDetailScreen() {
         orderId: order.id,
         totalValue: totalValueForCheckout,
         description: `Pagamento do Pedido #${order.id.substring(0, 8)}`,
-        userEmail: 'TESTUSER1039688960975491054@testuser.com',
-        userName: user.name,
+        userEmail: user?.email || 'email-placeholder@example.com',
+        userName: user?.name,
       };
-      console.log('Iniciando checkout com dados:', checkoutData);
 
       const checkoutResponse = await api.post('/checkout/create', checkoutData);
 
       if (checkoutResponse.data.paymentUrl) {
-        Linking.openURL(checkoutResponse.data.paymentUrl);
+        const supported = await Linking.canOpenURL(
+          checkoutResponse.data.paymentUrl,
+        );
+        if (supported) {
+          Linking.openURL(checkoutResponse.data.paymentUrl);
+        } else {
+          Alert.alert('Atenção', 'Não foi possível abrir o link de pagamento.');
+        }
       } else {
         throw new Error('Link de pagamento não retornado.');
       }
@@ -105,9 +158,14 @@ export default function OrderDetailScreen() {
       </CenteredView>
     );
   }
+
   const rawValue = order.payment?.totalValue || order.totalValue || 0;
 
-  const formattedValue = Number(rawValue).toFixed(2).replace('.', ',');
+  const formattedValue = Number(rawValue)
+    .toFixed(2)
+    .replace('.', ',')
+    .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+
   const isPending = order.status === 'waiting_payment';
 
   const displayStatus = order.status.replace('_', ' ').toUpperCase();
@@ -138,8 +196,44 @@ export default function OrderDetailScreen() {
           </DetailRow>
         </DetailCard>
 
-        {isPending && (
-          <PayButton onPress={handleInitiatePayment} disabled={loadingPayment}>
+        {isAdmin && (
+          <DetailCard style={{ marginTop: 20 }}>
+            <Title style={{ fontSize: 18, marginBottom: 10 }}>
+              Controle Administrativo
+            </Title>
+
+            <StatusPicker
+              currentStatus={selectedStatus}
+              onStatusChange={setSelectedStatus}
+            />
+
+            <PayButton
+              onPress={handleUpdateStatus}
+              disabled={loadingUpdate || selectedStatus === order.status}
+              style={{
+                backgroundColor:
+                  loadingUpdate || selectedStatus === order.status
+                    ? '#ccc'
+                    : '#5D82FB',
+                marginTop: 15,
+                alignSelf: 'stretch',
+              }}
+            >
+              {loadingUpdate ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <PayButtonText>Salvar Novo Status</PayButtonText>
+              )}
+            </PayButton>
+          </DetailCard>
+        )}
+
+        {isPending && !isAdmin && (
+          <PayButton
+            onPress={handleInitiatePayment}
+            disabled={loadingPayment}
+            style={{ marginTop: 20 }}
+          >
             {loadingPayment ? (
               <ActivityIndicator color="#fff" />
             ) : (

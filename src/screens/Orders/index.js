@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { BackGround } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { FlatList, ActivityIndicator } from 'react-native';
-import { SectionTitle, ContentArea } from './styles';
+import { SectionTitle, ContentArea, BackGround } from './styles';
 import OrdersListItem from '../../components/OrderListItem';
 import api from '../../services/api';
 import { AuthContext } from '../../contexts/auth';

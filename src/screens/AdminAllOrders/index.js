@@ -1,1 +1,59 @@
-// inicio
+import React, { useEffect, useState, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { FlatList, ActivityIndicator } from 'react-native';
+import { SectionTitle, ContentArea, BackGround } from './styles';
+import OrdersListItem from '../../components/OrderListItem';
+import api from '../../services/api';
+import { AuthContext } from '../../contexts/auth';
+
+export default function AdminAllOrders() {
+  const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
+
+  const [loading, setLoading] = useState(false);
+  const [ordersList, setOrdersList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get('/orders');
+        console.log(response);
+        setOrdersList(response.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleItemPress = item => {
+    navigation.navigate('OrderDetail', { id: item.id });
+  };
+
+  return (
+    <BackGround>
+      <ContentArea showsVerticalScrollIndicator={false}>
+        <SectionTitle>Todos os Pedidos</SectionTitle>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <FlatList
+            data={ordersList}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <OrdersListItem
+                item={item}
+                onPress={() => handleItemPress(item)}
+              />
+            )}
+            scrollEnabled={false}
+          />
+        )}
+      </ContentArea>
+    </BackGround>
+  );
+}

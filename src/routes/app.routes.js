@@ -6,6 +6,7 @@ import OrderModal from '../components/OrderModal';
 import MaterialDetailScreen from '../screens/MaterialDetail';
 import ListsScreen from '../screens/Lists';
 import OrderDetailScreen from '../screens/OrderDetail';
+import AdminAllOrders from '../screens/AdminAllOrders';
 
 const RootStack = createStackNavigator();
 
@@ -67,6 +68,16 @@ export default function AppRoutes() {
                 options={{
                     headerShown: true,
                     title: 'Detalhes do Pedido',
+                    headerStyle: { backgroundColor: '#5D82FB' },
+                    headerTintColor: '#fff',
+                }}
+            />
+             <RootStack.Screen
+                name="AdminAllOrders"
+                component={AdminAllOrders}
+                options={{
+                    headerShown: true,
+                    title: 'Todos os Pedidos',
                     headerStyle: { backgroundColor: '#5D82FB' },
                     headerTintColor: '#fff',
                 }}

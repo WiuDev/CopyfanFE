@@ -9,7 +9,7 @@ const getStatusColor = (status) => {
       return '#3498DB';
     case 'waiting_payment':
       return '#FF9C55';
-    case 'failed':
+    case 'canceled':
       return '#E74C3C';
     default:
       return '#7F8C8D'; 
