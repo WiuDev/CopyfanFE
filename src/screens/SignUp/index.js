@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Platform, ActivityIndicator, Alert, View } from 'react-native';
+import { Platform, ActivityIndicator, Alert, View, KeyboardAvoidingView } from 'react-native';
 
 import { AuthContext } from '../../contexts/auth.js';
 import CoursePicker from '../../components/CoursePicker';
@@ -88,6 +88,11 @@ export default function SignUp() {
   }
 
   return (
+    <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          enabled
+        >
     <BackGround>
       <Container behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
         <AreaInput>
@@ -145,5 +150,6 @@ export default function SignUp() {
         </SubmitButton>
       </Container>
     </BackGround>
+    </KeyboardAvoidingView>
   );
 }
