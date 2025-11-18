@@ -18,7 +18,6 @@ export default function AdminAllOrders() {
       setLoading(true);
       try {
         const response = await api.get('/orders');
-        console.log(response);
         setOrdersList(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
