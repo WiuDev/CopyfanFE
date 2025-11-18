@@ -9,6 +9,7 @@ import OrderDetailScreen from '../screens/OrderDetail';
 import AdminAllOrders from '../screens/AdminAllOrders';
 import AdminValues from '../screens/AdminValues';
 import AdminPayments from '../screens/AdminPayments';
+import AdminUsers from '../screens/AdminUsers';
 
 const RootStack = createStackNavigator();
 
@@ -97,6 +98,16 @@ export default function AppRoutes() {
             <RootStack.Screen
                 name="AdminPayments"
                 component={AdminPayments}
+                options={{
+                    headerShown: true,
+                    title: 'Todos os Pedidos',
+                    headerStyle: { backgroundColor: '#5D82FB' },
+                    headerTintColor: '#fff',
+                }}
+            />
+            <RootStack.Screen
+                name="AdminUsers"
+                component={AdminUsers}
                 options={{
                     headerShown: true,
                     title: 'Todos os Pedidos',
