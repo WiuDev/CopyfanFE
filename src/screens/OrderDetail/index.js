@@ -114,18 +114,17 @@ export default function OrderDetailScreen() {
         orderId: order.id,
         totalValue: totalValueForCheckout,
         description: `Pagamento do Pedido #${order.id.substring(0, 8)}`,
-        userEmail: user?.email || 'email-placeholder@example.com',
+        userEmail: user?.email,
         userName: user?.name,
       };
 
-      const checkoutResponse = await api.post('/checkout/create', checkoutData);
-
-      if (checkoutResponse.data.paymentUrl) {
+      const checkoutResponse = await api.post('/checkout', checkoutData);
+      if (checkoutResponse.data.init_point) {
         const supported = await Linking.canOpenURL(
-          checkoutResponse.data.paymentUrl,
+          checkoutResponse.data.init_point,
         );
         if (supported) {
-          Linking.openURL(checkoutResponse.data.paymentUrl);
+          Linking.openURL(checkoutResponse.data.init_point);
         } else {
           Alert.alert('Atenção', 'Não foi possível abrir o link de pagamento.');
         }
@@ -133,7 +132,6 @@ export default function OrderDetailScreen() {
         throw new Error('Link de pagamento não retornado.');
       }
     } catch (error) {
-      console.error('Erro ao iniciar pagamento:', error);
       Alert.alert(
         'Erro no Pagamento',
         'Falha ao gerar o link do Mercado Pago.',

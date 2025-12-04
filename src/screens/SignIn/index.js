@@ -29,12 +29,17 @@ export default function SignIn() {
 
   const { signIn, loadingAuth } = useContext(AuthContext);
 
-  function HandleLogin() {
+  async function HandleLogin() {
     if (email === '' || password === '') {
       Alert.alert('Atenção', 'Preencha todos os campos!');
       return;
     }
-    signIn(email, password);
+    try {
+      signIn(email, password);
+    } catch (error) {
+      Alert.alert('Erro', 'Seu email ou senha estão incorretos!');
+    }
+    
   }
 
   return (
