@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { FlatList, ActivityIndicator } from 'react-native';
 import { SectionTitle, ContentArea, BackGround } from './styles';
 import OrdersListItem from '../../components/OrderListItem';
@@ -13,21 +13,32 @@ export default function OrdersScreen() {
   const [loading, setLoading] = useState(false);
   const [ordersList, setOrdersList] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get('/orders/me');
-        setOrdersList(response.data);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = useCallback(async () => {
+        if (!user?.id) { 
+            return; 
+        }
+        setLoading(true);
+        try {
+            const response = await api.get('/orders/me');
+            setOrdersList(response.data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [user]);
 
-    fetchData();
-  }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [fetchData])
+    );
+    
+    useEffect(() => {
+        if (user) { 
+             fetchData();
+        }
+    }, [user, fetchData]);
 
   const handleItemPress = item => {
     navigation.navigate('OrderDetail', { id: item.id });

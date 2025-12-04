@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { FlatList, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { BackGround, SectionTitle, QuickNavArea, ContentArea } from './styles';
 import MaterialListItem from '../../components/MaterialListItem';
 import EmptyState from '../../components/EmptyState';
@@ -13,6 +13,11 @@ export default function HomeScreen() {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [materialsList, setMaterialsList] = useState([]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    },[])
+  )
   const fetchData = async () => {
     if (!user?.id) {
       return;

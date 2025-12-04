@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { FlatList, ActivityIndicator } from 'react-native';
 import { SectionTitle, ContentArea, BackGround } from './styles';
 import OrdersListItem from '../../components/OrderListItem';
@@ -13,25 +13,43 @@ export default function AdminAllOrders() {
   const [loading, setLoading] = useState(false);
   const [ordersList, setOrdersList] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get('/orders');
-        setOrdersList(response.data);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const isAdmin = user?.role === 'admin';
 
-    fetchData();
-  }, []);
+  const fetchData = useCallback(async () => {
+    if (!isAdmin) {
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
+    try {
+      const response = await api.get('/orders');
+      setOrdersList(response.data);
+    } catch (error) {
+      console.error('Error fetching admin orders:', error);
+      setOrdersList([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAdmin]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData]),
+  );
   const handleItemPress = item => {
     navigation.navigate('OrderDetail', { id: item.id });
   };
+  if (!isAdmin) {
+    return (
+      <CenteredView>
+        <Text style={{ color: '#E74C3C', fontSize: 18 }}>
+          Acesso Negado. Você não é um administrador.
+        </Text>
+      </CenteredView>
+    );
+  }
 
   return (
     <BackGround>

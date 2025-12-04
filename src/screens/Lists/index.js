@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native';
 import api from '../../services/api';
 import MaterialListItem from '../../components/MaterialListItem';
 import FilterSelectionModal from '../../components/FilterSelectionModal';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import {
   Container,
   FilterArea,
@@ -28,11 +28,10 @@ export default function ListsScreen() {
     classPeriod: null,
   });
 
-  async function fetchPublicLists() {
+  const fetchPublicLists = useCallback(async () => {
     setLoadingLists(true);
     try {
       let url = '/materials?role=professor&is_visible=true';
-
       if (filters.search) {
         url += `&name=${encodeURIComponent(filters.search)}`;
       }
@@ -50,10 +49,13 @@ export default function ListsScreen() {
     } finally {
       setLoadingLists(false);
     }
-  }
-  useEffect(() => {
-    fetchPublicLists();
   }, [filters]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPublicLists();
+    }, [fetchPublicLists]),
+  );
 
   const handleSearchChange = text => {
     setFilters(prev => ({ ...prev, search: text }));
