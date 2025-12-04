@@ -17,6 +17,8 @@ export const Logo = styled.Image`
 
 export const AreaInput = styled.View`
   flex-direction: row;
+  position: relative;
+  align-items: center;
 `;
 export const Input = styled.TextInput`
   background-color: #fff;

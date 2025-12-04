@@ -5,7 +5,11 @@ import {
   Alert,
   KeyboardAvoidingView,
   Keyboard,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+
+import Icon from 'react-native-vector-icons/Feather';
 
 import {
   BackGround,
@@ -26,8 +30,13 @@ export default function SignIn() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const { signIn, loadingAuth } = useContext(AuthContext);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   async function HandleLogin() {
     if (email === '' || password === '') {
@@ -39,7 +48,6 @@ export default function SignIn() {
     } catch (error) {
       Alert.alert('Erro', 'Seu email ou senha estão incorretos!');
     }
-    
   }
 
   return (
@@ -60,17 +68,33 @@ export default function SignIn() {
               placeholder="Seu Email"
               value={email}
               onChangeText={setEmail}
-              placeholderTextColor="#121212"
+              placeholderTextColor="#888"
             />
           </AreaInput>
-          <AreaInput>
+          <AreaInput style={{ justifyContent: 'center' }}>
             <Input
               placeholder="Sua Senha"
-              placeholderTextColor="#121212"
+              placeholderTextColor="#888"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={!showPassword}
+              style={{ paddingRight: 50 }}
             />
+            <TouchableOpacity
+              onPress={togglePasswordVisibility}
+              style={{
+                position: 'absolute',
+                right: 15,
+                padding: 10,
+                zIndex: 10,
+              }}
+            >
+              <Icon
+                name={showPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
           </AreaInput>
           <SubmitButton activeOpacity={0.8} onPress={HandleLogin}>
             {loadingAuth ? (

@@ -1,6 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { Platform, ActivityIndicator, Alert, View, KeyboardAvoidingView } from 'react-native';
-
+import {
+  Platform,
+  ActivityIndicator,
+  Alert,
+  View,
+  KeyboardAvoidingView,
+  TouchableOpacity,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 import { AuthContext } from '../../contexts/auth.js';
 import CoursePicker from '../../components/CoursePicker';
 
@@ -19,8 +26,13 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [courseId, setCourseId] = useState(null);
-  
+
+  const togglePasswordVisibility = () => setShowPassword(prev => !prev);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(prev => !prev);
   const isValidEmail = email => {
     const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
@@ -89,67 +101,99 @@ export default function SignUp() {
 
   return (
     <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
-          enabled
-        >
-    <BackGround>
-      <Container behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
-        <AreaInput>
-          <Input
-            placeholder="Nome"
-            value={name}
-            onChangeText={text => setName(text)}
-            placeholderTextColor='#121212'
-          />
-        </AreaInput>
-        <AreaInput>
-          <Input
-            placeholder="Seu E-mail"
-            value={email}
-            onChangeText={text => setEmail(text)}
-            placeholderTextColor='#121212'
-          />
-        </AreaInput>
-        <AreaInput>
-          <Input
-            placeholder="Sua Senha"
-            value={password}
-            onChangeText={text => setPassword(text)}
-            secureTextEntry={true}
-            placeholderTextColor='#121212'
-          />
-        </AreaInput>
-        <AreaInput>
-          <Input
-            placeholder="Confirme Sua Senha"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={true}
-            placeholderTextColor='#121212'
-          />
-        </AreaInput>
-        <View
-          style={{
-            width: '90%',
-            alignSelf: 'center',
-            marginBottom: 15,
-          }}
-        >
-          <CoursePicker
-            selectedCourseId={courseId}
-            onCourseChange={setCourseId}
-          />
-        </View>
-        <SubmitButton activeOpacity={0.8} onPress={handleSignUp}>
-          {loadingAuth ? (
-            <ActivityIndicator size={20} color="#FFF" />
-          ) : (
-            <SubmitText>Cadastrar</SubmitText>
-          )}
-        </SubmitButton>
-      </Container>
-    </BackGround>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+      enabled
+    >
+      <BackGround>
+        <Container behavior={Platform.OS === 'ios' ? 'padding' : ''} enabled>
+          <AreaInput>
+            <Input
+              placeholder="Nome"
+              value={name}
+              onChangeText={text => setName(text)}
+              placeholderTextColor="#121212"
+            />
+          </AreaInput>
+          <AreaInput>
+            <Input
+              placeholder="Seu E-mail"
+              value={email}
+              onChangeText={text => setEmail(text)}
+              placeholderTextColor="#121212"
+            />
+          </AreaInput>
+          <AreaInput style={{ justifyContent: 'center', position: 'relative' }}>
+            <Input
+              placeholder="Sua Senha"
+              value={password}
+              onChangeText={text => setPassword(text)}
+              secureTextEntry={!showPassword}
+              placeholderTextColor="#121212"
+              style={{ paddingRight: 50 }}
+            />
+            <TouchableOpacity
+              onPress={togglePasswordVisibility}
+              style={{
+                position: 'absolute',
+                right: 15,
+                padding: 10,
+                zIndex: 10,
+              }}
+            >
+              <Icon
+                name={showPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </AreaInput>
+          <AreaInput style={{ justifyContent: 'center', position: 'relative' }}>
+            <Input
+              placeholder="Confirme Sua Senha"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+              placeholderTextColor="#121212"
+              style={{ paddingRight: 50 }}
+            />
+            <TouchableOpacity
+              onPress={toggleConfirmPasswordVisibility}
+              style={{
+                position: 'absolute',
+                right: 15,
+                padding: 10,
+                zIndex: 10,
+              }}
+            >
+              <Icon
+                name={showConfirmPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </AreaInput>
+          <View
+            style={{
+              width: '90%',
+              alignSelf: 'center',
+              marginBottom: 15,
+            }}
+          >
+            <CoursePicker
+              selectedCourseId={courseId}
+              onCourseChange={setCourseId}
+            />
+          </View>
+          <SubmitButton activeOpacity={0.8} onPress={handleSignUp}>
+            {loadingAuth ? (
+              <ActivityIndicator size={20} color="#FFF" />
+            ) : (
+              <SubmitText>Cadastrar</SubmitText>
+            )}
+          </SubmitButton>
+        </Container>
+      </BackGround>
     </KeyboardAvoidingView>
   );
 }
