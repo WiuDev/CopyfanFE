@@ -38,11 +38,6 @@ function TabNavigator() {
             <Icon name="home" color={color} size={size} />
           ),
           headerTitle: `Olá, ${user.name}`,
-          headerRight: () => (
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <Icon name="bell" size={25} color="#fff" />
-            </TouchableOpacity>
-          ),
         }}
       />
       <Tab.Screen

@@ -103,6 +103,19 @@ export default function SignIn() {
               <SubmitText>Entrar</SubmitText>
             )}
           </SubmitButton>
+          <Link onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+            <LinkText
+              style={{
+                marginTop: 10,
+                marginBottom: 10,
+                fontSize: 14,
+                fontWeight: '600',
+                color: '#FF9C55',
+              }}
+            >
+              Esqueci minha senha
+            </LinkText>
+          </Link>
           <Link onPress={() => navigation.navigate('SignUp')}>
             <LinkText>Criar uma conta</LinkText>
           </Link>
