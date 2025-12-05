@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, Alert, Linking, ActivityIndicator } from 'react-native';
+import { View, Alert, Linking, ActivityIndicator, TouchableOpacity, Text } from 'react-native';
 
 import { useRoute } from '@react-navigation/native';
 import api from '../../services/api';
@@ -140,6 +140,58 @@ export default function OrderDetailScreen() {
       setLoadingPayment(false);
     }
   };
+  const handleCancelation = () => {
+    // 1. Verifica se o pedido pode ser cancelado (waiting_payment)
+    if (order.status !== 'waiting_payment') {
+      Alert.alert(
+        'Atenção',
+        'O pedido só pode ser cancelado se estiver aguardando pagamento.',
+      );
+      return;
+    }
+
+    // 2. Apresenta o diálogo de confirmação
+    Alert.alert(
+      'Confirmar Cancelamento',
+      `Tem certeza que deseja cancelar o pedido #${order.id.substring(
+        0,
+        8,
+      )}? Essa ação não pode ser desfeita.`,
+      [
+        { text: 'Não', style: 'cancel' },
+        {
+          text: 'Sim, Cancelar',
+          // 3. 🎯 Chamada direta à API após a confirmação do usuário
+          onPress: confirmCancelationApiCall,
+          style: 'destructive',
+        },
+      ],
+    );
+  };
+
+  // 🎯 FUNÇÃO DE API (Executada APENAS após o usuário clicar em 'Sim, Cancelar')
+  const confirmCancelationApiCall = async () => {
+    setLoadingPayment(true); // Reutiliza o estado de loading
+    try {
+      // 4. PUT /orders/:id/cancel
+      await api.put(`/orders/${order.id}/cancel`);
+
+      Alert.alert(
+        'Cancelado',
+        `O pedido #${order.id.substring(0, 8)} foi cancelado.`,
+      );
+
+      // 5. Recarrega os dados para mostrar o status 'canceled'
+      fetchOrderDetails();
+    } catch (error) {
+      Alert.alert(
+        'Erro',
+        error.response?.data?.error || 'Falha ao processar o cancelamento.',
+      );
+    } finally {
+      setLoadingPayment(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -238,6 +290,33 @@ export default function OrderDetailScreen() {
               <PayButtonText>Pagar R$ {formattedValue}</PayButtonText>
             )}
           </PayButton>
+        )}
+
+
+
+        {isPending && !isAdmin && (
+          <View style={{ marginTop: 15, width: '100%' }}>
+            <TouchableOpacity
+              onPress={handleCancelation} // 💡 Chama a função unificada
+              disabled={loadingPayment}
+              style={{
+                backgroundColor: '#E74C3C',
+                padding: 15,
+                borderRadius: 8,
+                alignItems: 'center',
+              }}
+            >
+              {loadingPayment ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text
+                  style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}
+                >
+                  Cancelar Pedido
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
         )}
       </ScrollContainer>
     </Container>
