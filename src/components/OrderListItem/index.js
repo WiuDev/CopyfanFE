@@ -16,6 +16,15 @@ import {
   DetailInfoText,
 } from './styles';
 
+const STATUS_MAP = {
+    'waiting_payment': 'Aguardando Pagamento',
+    'processing': 'Em Processamento',
+    'canceled': 'Cancelado',
+    'completed': 'Concluído',
+    'pending': 'Pendente (MP)',
+    'failed': 'Falha no Pagamento',
+};
+
 const OrderListItem = ({ item, onPress }) => {
   const hasMaterials = item.materials && item.materials.length > 0;
   const totalQuantity = item.materials.reduce((sum, material) => {
@@ -36,6 +45,9 @@ const OrderListItem = ({ item, onPress }) => {
     .join(', ');
   const orderTitle = `Pedido #${item.id.substring(0, 8)}`;
   const isPaymentPending = item.status === 'waiting_payment';
+  const getTranslatedStatus = (status) => {
+    return STATUS_MAP[status] || status.replace('_', ' '); 
+};
   return (
     <ItemContainer onPress={onPress}>
       <HeaderArea>
@@ -50,7 +62,7 @@ const OrderListItem = ({ item, onPress }) => {
         </View>
 
         <StatusPill status={item.status}>
-          <StatusText>{item.status.replace('_', ' ')}</StatusText>
+          <StatusText>{getTranslatedStatus(item.status)}</StatusText>
         </StatusPill>
       </HeaderArea>
       <PriceAndStatusArea>

@@ -10,6 +10,17 @@ const ADMIN_STATUSES = [
   'canceled',
 ];
 
+const STATUS_MAP = {
+  'waiting_payment': 'Aguardando Pagamento',
+  'processing': 'Em Processamento',
+  'canceled': 'Cancelado',
+  'completed': 'Concluído',
+};
+
+const getTranslatedStatus = (status) => {
+  return STATUS_MAP[status] || status.replace('_', ' ');
+};
+
 export default function StatusPicker({
   currentStatus,
   onStatusChange,
@@ -36,7 +47,7 @@ export default function StatusPicker({
         {ADMIN_STATUSES.map(status => (
           <Picker.Item
             key={status}
-            label={status.replace('_', ' ').toUpperCase()}
+            label={getTranslatedStatus(status).toUpperCase()}
             value={status}
           />
         ))}

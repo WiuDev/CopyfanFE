@@ -21,6 +21,17 @@ import {
   CenteredView,
 } from './styles';
 
+const STATUS_MAP = {
+    'waiting_payment': 'Aguardando Pagamento',
+    'processing': 'Em Processamento',
+    'canceled': 'Cancelado',
+    'completed': 'Concluído',
+    'pending': 'Pendente (MP)',
+    'failed': 'Falha no Pagamento',
+};
+const getTranslatedStatus = (status) => {
+    return STATUS_MAP[status] || status.replace('_', ' ');
+};
 export default function OrderDetailScreen() {
   const route = useRoute();
   const { user } = useContext(AuthContext);
@@ -71,11 +82,8 @@ export default function OrderDetailScreen() {
 
       Alert.alert(
         'Sucesso',
-        `Status do pedido atualizado para ${newStatus
-          .replace('_', ' ')
-          .toUpperCase()}.`,
+        `Status do pedido atualizado para ${getTranslatedStatus(newStatus).toUpperCase()}.`,
       );
-      // Atualiza o estado local
       setOrder(prev => ({ ...prev, status: newStatus }));
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
@@ -141,7 +149,6 @@ export default function OrderDetailScreen() {
     }
   };
   const handleCancelation = () => {
-    // 1. Verifica se o pedido pode ser cancelado (waiting_payment)
     if (order.status !== 'waiting_payment') {
       Alert.alert(
         'Atenção',
@@ -150,7 +157,6 @@ export default function OrderDetailScreen() {
       return;
     }
 
-    // 2. Apresenta o diálogo de confirmação
     Alert.alert(
       'Confirmar Cancelamento',
       `Tem certeza que deseja cancelar o pedido #${order.id.substring(
@@ -161,7 +167,6 @@ export default function OrderDetailScreen() {
         { text: 'Não', style: 'cancel' },
         {
           text: 'Sim, Cancelar',
-          // 3. 🎯 Chamada direta à API após a confirmação do usuário
           onPress: confirmCancelationApiCall,
           style: 'destructive',
         },
@@ -169,19 +174,15 @@ export default function OrderDetailScreen() {
     );
   };
 
-  // 🎯 FUNÇÃO DE API (Executada APENAS após o usuário clicar em 'Sim, Cancelar')
   const confirmCancelationApiCall = async () => {
-    setLoadingPayment(true); // Reutiliza o estado de loading
+    setLoadingPayment(true);
     try {
-      // 4. PUT /orders/:id/cancel
       await api.put(`/orders/${order.id}/cancel`);
 
       Alert.alert(
         'Cancelado',
         `O pedido #${order.id.substring(0, 8)} foi cancelado.`,
       );
-
-      // 5. Recarrega os dados para mostrar o status 'canceled'
       fetchOrderDetails();
     } catch (error) {
       Alert.alert(
@@ -218,7 +219,7 @@ export default function OrderDetailScreen() {
 
   const isPending = order.status === 'waiting_payment';
 
-  const displayStatus = order.status.replace('_', ' ').toUpperCase();
+  const displayStatus = getTranslatedStatus(order.status).toUpperCase();
 
   return (
     <Container>
@@ -297,7 +298,7 @@ export default function OrderDetailScreen() {
         {isPending && !isAdmin && (
           <View style={{ marginTop: 15, width: '100%' }}>
             <TouchableOpacity
-              onPress={handleCancelation} // 💡 Chama a função unificada
+              onPress={handleCancelation}
               disabled={loadingPayment}
               style={{
                 backgroundColor: '#E74C3C',

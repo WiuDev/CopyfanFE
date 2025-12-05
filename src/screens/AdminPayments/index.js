@@ -4,6 +4,16 @@ import api from '../../services/api';
 import { useFocusEffect } from '@react-navigation/native';
 import { Container, SectionTitle, CenteredView } from './styles'; 
 
+const STATUS_MAP = {
+    'pending': 'Aguardando Pagamento',
+    'failed': 'Falha no Pagamento',
+    'completed': 'Concluído',
+};
+
+const getTranslatedStatus = (status) => {
+    return STATUS_MAP[status] || status.replace('_', ' ');
+};
+
 const PaymentListItem = ({ item }) => {
     const formattedValue = parseFloat(item.totalValue).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const isCompleted = item.statusPayment === 'completed';
@@ -14,7 +24,7 @@ const PaymentListItem = ({ item }) => {
             <View>
                 <Text style={{ fontWeight: 'bold', color: isCompleted ? '#333' : '#777' }}>Pedido #{item.order_id.substring(0, 8)}</Text>
                 <Text style={{ fontSize: 12, color: statusColor }}>
-                    Status: {item.statusPayment.toUpperCase()}
+                    Status: {getTranslatedStatus(item.statusPayment).toUpperCase()}
                 </Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
