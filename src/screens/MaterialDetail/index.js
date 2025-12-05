@@ -71,6 +71,17 @@ export default function MaterialDetailScreen() {
     }
     processMaterial();
   }, [materialId]);
+  useEffect(() => {
+    return () => {
+      if (localFileUri) {
+        const path = localFileUri.replace('file://', '');
+        RNFS.unlink(path)
+          .then(() => console.log('Arquivo de cache PDF deletado:', path))
+          .catch(err => console.error('Erro ao deletar cache:', err));
+      }
+    };
+  }, [localFileUri]);
+
   const handleStartOrder = () => {
     if (!materialId) return;
     navigation.navigate('OrderConfigModal', { materialId: materialId });
@@ -88,6 +99,7 @@ export default function MaterialDetailScreen() {
           <Pdf
             source={{ uri: localFileUri }}
             style={{ flex: 1, width: '100%' }}
+            fitPolicy={2}
             onError={error => {
               console.error('Erro no PDF Viewer:', error);
               Alert.alert('Erro', 'Falha ao renderizar o PDF.');
